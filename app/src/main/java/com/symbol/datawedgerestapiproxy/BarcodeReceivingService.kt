@@ -48,6 +48,26 @@ class BarcodeReceivingService : IntentService("BarcodeReceivingService") {
         }
     }
 
+    private fun makeRestfulCall(barcodeData: String?, symbology: String?) {
+        val payload = JSONObject()
+        payload.put("data", barcodeData)
+        payload.put("symbology", symbology)
+
+        val volleyRequestQueue = Volley.newRequestQueue(this)
+        val volleyJsonRequest = JsonObjectRequest(Request.Method.GET, URL, payload, Response.Listener { response ->
+            val str = response.toString()
+            Log.d(TAG,"(Success) Response from server: $str")
+        }, Response.ErrorListener {
+                error ->
+            Log.w(TAG,"(Error) Response from server: ${error.message}")
+        })
+        volleyRequestQueue.add(volleyJsonRequest)
+    }
+
+    ///////////////////////////////////////////////////////
+    //  Notification
+    ///////////////////////////////////////////////////////
+
     private fun prepareNotification(): Notification {
         // handle build version above android oreo
         val mNotificationManager: NotificationManager
@@ -95,22 +115,5 @@ class BarcodeReceivingService : IntentService("BarcodeReceivingService") {
 
         return notificationBuilder.build()
     }
-
-    private fun makeRestfulCall(barcodeData: String?, symbology: String?) {
-        val payload = JSONObject()
-        payload.put("data", barcodeData)
-        payload.put("symbology", symbology)
-
-        val volleyRequestQueue = Volley.newRequestQueue(this)
-        val volleyJsonRequest = JsonObjectRequest(Request.Method.GET, URL, payload, Response.Listener { response ->
-            val str = response.toString()
-            Log.d(TAG,"(Success) Response from server: $str")
-        }, Response.ErrorListener {
-                error ->
-            Log.w(TAG,"(Error) Response from server: ${error.message}")
-        })
-        volleyRequestQueue.add(volleyJsonRequest)
-    }
-
 
 }
